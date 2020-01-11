@@ -1,4 +1,4 @@
-# JavaGameProgramming
+# Java Multiplayer Game
 ### Um jogo bem simples, mas com bastante coisa envolvida na produção. Tudo o que foi feito aqui foi ensinado pelo youtuber vanZeBen. Link para os que desejam: [vanZeBen](https://www.youtube.com/channel/UCGml1ZcXmwTZOIS63wXxdZw)
 
 Aqui está meu projeto final de POO, não sei se devo me orgulhar do que está aqui já que tudo o que eu fiz foi ver as aulas
