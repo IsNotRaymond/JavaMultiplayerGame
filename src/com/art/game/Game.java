@@ -16,6 +16,8 @@ import com.art.game.graphics.Screen;
 import com.art.game.graphics.SpriteSheet;
 import com.art.game.input.InputKeyboard;
 import com.art.game.level.Level;
+import com.art.game.net.GameClient;
+import com.art.game.net.GameServer;
 
 public class Game extends Canvas implements Runnable {
 	private static final long serialVersionUID = 1L;
@@ -31,6 +33,9 @@ public class Game extends Canvas implements Runnable {
 	private InputKeyboard input;
 	private Level level;
 	private Player player;
+	
+	private GameClient cliente;
+	private GameServer servidor;
 	
 	private BufferedImage imagem = new BufferedImage(LARGURA, ALTURA, BufferedImage.TYPE_INT_RGB);
 	private int[] pixels = ((DataBufferInt) imagem.getRaster().getDataBuffer()).getData();
@@ -67,6 +72,14 @@ public class Game extends Canvas implements Runnable {
 		executando = true;
 		thread = new Thread(this, "Game-Main");
 		thread.start();
+		
+		if (JOptionPane.showConfirmDialog(this, "Voce deseja iniciar o Servidor") == 0) {
+			servidor = new GameServer(this);
+			servidor.start();
+		}
+		
+		cliente = new GameClient(this, "localhost");
+		cliente.start();
 		
 	}
 	
@@ -133,6 +146,7 @@ public class Game extends Canvas implements Runnable {
 		level = new Level("res/levels/watertest.png");
 		player = new Player(level, 0, 0, input, JOptionPane.showInputDialog(this, "Por favor, ponha seu nome abaixo"));
 		level.addEntity(player);
+		cliente.sendData("ping".getBytes());
 	}
 
 	private void adicionarCores() {
