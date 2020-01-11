@@ -11,8 +11,6 @@ import java.awt.image.DataBufferInt;
 import javax.swing.JFrame;
 
 import com.art.game.entities.Player;
-import com.art.game.graphics.Colors;
-import com.art.game.graphics.Font;
 import com.art.game.graphics.Screen;
 import com.art.game.graphics.SpriteSheet;
 import com.art.game.input.InputKeyboard;
@@ -131,7 +129,7 @@ public class Game extends Canvas implements Runnable {
 		
 		tela = new Screen(LARGURA, ALTURA, new SpriteSheet("res/sheet/spritesheet.png"));
 		input = new InputKeyboard(this);
-		level = new Level(64, 64);
+		level = new Level("res/levels/teste.png");
 		player = new Player(level, 0, 0, input);
 		level.addEntity(player);
 	}
@@ -168,20 +166,6 @@ public class Game extends Canvas implements Runnable {
 		}
 		
 		level.renderizarTile(tela, player.x - (tela.largura / 2), player.y - (tela.altura / 2));
-		
-		//String mensagem = "Hello world! KK01";
-		// Font.renderizar(mensagem, tela, new Vector2(tela.offSet.x + tela.largura / 2 - ((mensagem.length() * 8) / 2), tela.offSet.y + tela.altura / 2), Colors.get(-1, -1, -1, 000));
-		
-		for (int x = 0; x < level.largura; x ++) {
-			int cor = Colors.get(-1, -1, -1, 000);
-			
-			if (x % 10 == 0 & x != 0) {
-				cor = Colors.get(-1, -1, -1, 500);
-			}
-			
-			Font.renderizar((x % 10) + "", tela, 0 + (x * 8), 0, cor);
-		}
-		
 		level.renderizarEntities(tela);
 		
 		
@@ -209,6 +193,10 @@ public class Game extends Canvas implements Runnable {
 		new Game().start();
 	}
 
-	
+	public static long fatorial(int n) {
+		if (n <= 1) return 1;
+		
+		else return n * fatorial(n - 1);
+	}
 
 }
