@@ -1,6 +1,7 @@
 package com.art.game.entities;
 
 import com.art.game.graphics.Colors;
+import com.art.game.graphics.Font;
 import com.art.game.graphics.Screen;
 import com.art.game.input.InputKeyboard;
 import com.art.game.level.Level;
@@ -13,10 +14,12 @@ public class Player extends Mob {
 	protected boolean nadando = false;
 	private int contaUpdates = 0;
 	
-	public Player(Level level, int x, int y, InputKeyboard input) {
+	private String nomeUsuario;
+	
+	public Player(Level level, int x, int y, InputKeyboard input, String nomeUsuario) {
 		super(level, "Player", x, y, 1);
 		this.input = input;
-		
+		this.nomeUsuario = nomeUsuario;
 	}
 	
 	@Override
@@ -91,6 +94,10 @@ public class Player extends Mob {
 		if (!nadando) {
 			tela.renderizar(xOffSet + (modificador * girarBaixo), yOffSet + modificador, xTile + (yTile + 1)* 32, cor, girarBaixo, escala);
 			tela.renderizar(xOffSet + modificador - (modificador * girarBaixo), yOffSet + modificador , (xTile + 1) + (yTile + 1)* 32, cor, girarBaixo, escala);
+		}
+		
+		if (nomeUsuario != null) {
+			Font.renderizar(nomeUsuario, tela, xOffSet - ((nomeUsuario.length() - 1) / 2 * 8), yOffSet - 10, Colors.get(-1, -1, -1, 555), 1);
 		}
 
 	}

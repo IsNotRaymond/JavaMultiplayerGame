@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 import com.art.game.entities.Player;
 import com.art.game.graphics.Screen;
@@ -130,7 +131,7 @@ public class Game extends Canvas implements Runnable {
 		tela = new Screen(LARGURA, ALTURA, new SpriteSheet("res/sheet/spritesheet.png"));
 		input = new InputKeyboard(this);
 		level = new Level("res/levels/watertest.png");
-		player = new Player(level, 0, 0, input);
+		player = new Player(level, 0, 0, input, JOptionPane.showInputDialog(this, "Por favor, ponha seu nome abaixo"));
 		level.addEntity(player);
 	}
 
