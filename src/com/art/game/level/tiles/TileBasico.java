@@ -10,10 +10,19 @@ public class TileBasico extends Tile {
 
 	public TileBasico(int id, int x, int y, int corTile, int corLevel) {
 		super(id, false, false, corLevel);
-		tileID = x + y;
+		tileID = x + y * 32;
 		tileCor = corTile;
 	}
 
+	@Override
+	public void update() {
+		
+	}
+	
+	public void render(Screen tela, Level level, int x, int y) {
+		
+	}
+	
 	@Override
 	public void renderizar(Screen tela, Level level, int x, int y) {
 		tela.renderizar(x, y, tileID, tileCor, 1);

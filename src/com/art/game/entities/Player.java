@@ -10,6 +10,8 @@ public class Player extends Mob {
 	private InputKeyboard input;
 	private int cor = Colors.get(-1, 111, 145, 543);
 	private int escala = 1;
+	protected boolean nadando = false;
+	private int contaUpdates = 0;
 	
 	public Player(Level level, int x, int y, InputKeyboard input) {
 		super(level, "Player", x, y, 1);
@@ -19,6 +21,8 @@ public class Player extends Mob {
 	
 	@Override
 	public void update() {
+		contaUpdates ++;
+		
 		int xA = 0, yA = 0;
 		
 		if (input.cima.pressionado()) yA --;
@@ -31,6 +35,14 @@ public class Player extends Mob {
 			caminhando = true;
 		} else {
 			caminhando = false;
+		}
+		
+		if (level.getTile(this.x >> 3, this.y >> 3).getID() == 3) {
+			nadando = true;
+		} 
+		
+		if (nadando && level.getTile(this.x >> 3, this.y >> 3).getID() != 3) {
+			nadando = false;
 		}
 	}
 
@@ -53,11 +65,34 @@ public class Player extends Mob {
 		int xOffSet = x - modificador / 2;
 		int yOffSet = y - modificador / 2 - 4;
 		
+		if (nadando) {
+			int corAgua;
+			yOffSet += 4;
+			
+			if (contaUpdates % 60 < 15) {
+				corAgua = Colors.get(-1, -1, 225, -1);
+			} else if (15 <= contaUpdates % 60 && contaUpdates % 60 < 30) {
+				yOffSet -= 1;
+				corAgua = Colors.get(-1, 225, 115, -1);
+			} else if (30 <= contaUpdates % 60 && contaUpdates % 60 < 45) {
+				yOffSet -= 1;
+				corAgua = Colors.get(-1, 115, -1, 225);
+			} else {
+				corAgua = Colors.get(-1, 225, 115, -1);
+			}
+			
+			tela.renderizar(xOffSet, yOffSet + 3, 0 + 27 * 32, corAgua, 0x00, 1);
+			tela.renderizar(xOffSet + 8, yOffSet + 3, 0 + 27 * 32, corAgua, 0x01, 1);
+		}
+		
 		tela.renderizar(xOffSet + (modificador * girarTopo), yOffSet , xTile + yTile * 32, cor, girarTopo, escala);
 		tela.renderizar(xOffSet + modificador - (modificador * girarTopo), yOffSet , (xTile + 1) + yTile * 32, cor, girarTopo, escala);
-		tela.renderizar(xOffSet + (modificador * girarBaixo), yOffSet + modificador, xTile + (yTile + 1)* 32, cor, girarBaixo, escala);
-		tela.renderizar(xOffSet + modificador - (modificador * girarBaixo), yOffSet + modificador , (xTile + 1) + (yTile + 1)* 32, cor, girarBaixo, escala);
 		
+		if (!nadando) {
+			tela.renderizar(xOffSet + (modificador * girarBaixo), yOffSet + modificador, xTile + (yTile + 1)* 32, cor, girarBaixo, escala);
+			tela.renderizar(xOffSet + modificador - (modificador * girarBaixo), yOffSet + modificador , (xTile + 1) + (yTile + 1)* 32, cor, girarBaixo, escala);
+		}
+
 	}
 
 	@Override

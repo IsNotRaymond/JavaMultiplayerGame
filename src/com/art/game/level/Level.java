@@ -105,6 +105,12 @@ public class Level {
 		for (Entity e : entities) {
 			e.update();
 		}
+		
+		for (Tile t : Tile.tiles) {
+			if (t == null) break;
+			
+			t.update();
+		}
 	}
 
 	public void renderizarTile(Screen tela, int xOffSet, int yOffSet) {
@@ -119,8 +125,8 @@ public class Level {
 
 		tela.setOffSet(xOffSet, yOffSet);
 
-		for (int y = 0; y < altura; y++) {
-			for (int x = 0; x < largura; x++) {
+		for (int y = (yOffSet >> 3); y < (yOffSet + tela.altura >> 3) + 1; y++) {
+			for (int x = (xOffSet >> 3); x < (xOffSet + tela.largura >> 3) + 1; x++) {
 				getTile(x, y).renderizar(tela, this, x << 3, y << 3);
 			}
 		}
