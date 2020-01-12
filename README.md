@@ -10,13 +10,13 @@ Então basicamente é isso. Ofereço meus agradecimentos principalmente ao youtu
 
 Grande dia para todo mundo.
 
-## Pontos Importantes
+### Pontos Importantes
 
 * Foi feito utilizando java puro
 * Possui uma estrutura simples de entender
 * Multiplayer funcional mas com algumas falhas
 
-## Pontos fracos
+### Pontos fracos
 
 * O multiplayer está com um erro para gerenciar nomes, isso é mostrado do vídeo de apresentação
 
