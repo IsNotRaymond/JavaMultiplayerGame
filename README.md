@@ -10,6 +10,10 @@ Então basicamente é isso. Ofereço meus agradecimentos principalmente ao youtu
 
 Grande dia para todo mundo.
 
+### Como utilizar
+
+* Apenas é necessário executar a classe Game (Recomendável utilizar uma IDE. Ex: Eclipse)
+
 ### Pontos Importantes
 
 * Foi feito utilizando java puro
@@ -18,7 +22,7 @@ Grande dia para todo mundo.
 
 ### Pontos fracos
 
-* O multiplayer está com um erro para gerenciar nomes, isso é mostrado do vídeo de apresentação
+* O multiplayer está com um erro para gerenciar nomes, isso é mostrado do [vídeo](https://youtu.be/oQyr7Zeqioc) de apresentação
 
 ## Autor
 
