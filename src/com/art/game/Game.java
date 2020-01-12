@@ -49,9 +49,6 @@ public class Game extends Canvas implements Runnable {
 	public boolean executando = false;
 	public int contaUpdates = 0;
 	
-	public boolean debug = true;
-	public boolean applet = false;
-	
 	public Game() {
 		setupFrame();
 	}
@@ -158,16 +155,13 @@ public class Game extends Canvas implements Runnable {
 		level.addEntity(jogador);
 		
 		// cliente.enviar("ping".getBytes());
-		
-		if (!applet) {
-			Packet00Login login = new Packet00Login(jogador.getNomeUsuario(), jogador.x, jogador.y);
+		Packet00Login login = new Packet00Login(jogador.getNomeUsuario(), jogador.x, jogador.y);
 			
-			if (servidor != null) {
-				servidor.adicionarConexao((PlayerMP) jogador, login);
-			}
-			
-			login.escrever(cliente);
+		if (servidor != null) {
+			servidor.adicionarConexao((PlayerMP) jogador, login);
 		}
+			
+		login.escrever(cliente);
 	}
 
 	private void adicionarCores() {

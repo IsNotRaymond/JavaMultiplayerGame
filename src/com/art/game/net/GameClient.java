@@ -90,13 +90,11 @@ public class GameClient extends Thread {
 	}
 
 	public void enviar(byte[] data) {
-		if (!game.applet) {
-			DatagramPacket packet = new DatagramPacket(data, data.length, enderecoIP, 1331);
-			try {
-				socket.send(packet);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		DatagramPacket packet = new DatagramPacket(data, data.length, enderecoIP, 1331);
+		try {
+			socket.send(packet);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 }
