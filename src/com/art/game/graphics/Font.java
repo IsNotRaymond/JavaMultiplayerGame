@@ -11,7 +11,7 @@ public class Font {
 		for (int i = 0; i < texto.length(); i ++) {
 			int indiceChar = chars.indexOf(texto.charAt(i));
 			
-			if (indiceChar != -1) tela.renderizar(x + (i * 8), y, indiceChar + 30 * 32, cor, escala);
+			if (indiceChar != -1) tela.renderizar(x + (i * 8), y, indiceChar + 30 * 32, cor, 0x00, escala);
 		}
 	}
 }

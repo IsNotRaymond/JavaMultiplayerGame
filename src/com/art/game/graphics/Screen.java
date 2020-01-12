@@ -69,10 +69,6 @@ public class Screen {
 		}
 	}
 
-	public void renderizar(int xPosicao, int yPosicao, int tile, int cor, int escala) {
-		renderizar(xPosicao, yPosicao, tile, cor, 0x00, escala);
-	}
-
 	public void setOffSet(int xOffSet, int yOffSet) {
 		this.xOffSet = xOffSet;
 		this.yOffSet = yOffSet;

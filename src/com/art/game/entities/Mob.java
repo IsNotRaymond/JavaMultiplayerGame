@@ -61,6 +61,30 @@ public abstract class Mob extends Entity {
 		return nome;
 	}
 	
+	public int getNumeroPassos() {
+        return numeroPassos;
+    }
+
+    public boolean caminhando() {
+        return caminhando;
+    }
+
+    public int getDirecao() {
+        return direcao;
+    }
+
+    public void setNumeroPassos(int numeroPassos) {
+        this.numeroPassos = numeroPassos;
+    }
+
+    public void setCaminhando(boolean caminhando) {
+        this.caminhando = caminhando;
+    }
+
+    public void setDirecao(int direcao) {
+        this.direcao = direcao;
+    }
+	
 	@Override
 	public abstract void update();
 

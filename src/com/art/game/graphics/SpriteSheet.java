@@ -7,6 +7,8 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public class SpriteSheet {
+	
+	public String caminho;
 	public int largura;
 	public int altura;
 	
@@ -27,6 +29,7 @@ public class SpriteSheet {
 		
 		if (imagem == null) return;
 		
+		this.caminho = caminho;
 		largura = imagem.getWidth();
 		altura = imagem.getHeight();
 		

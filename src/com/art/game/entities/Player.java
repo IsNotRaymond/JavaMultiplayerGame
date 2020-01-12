@@ -1,10 +1,12 @@
 package com.art.game.entities;
 
+import com.art.game.Game;
 import com.art.game.graphics.Colors;
 import com.art.game.graphics.Font;
 import com.art.game.graphics.Screen;
 import com.art.game.input.InputKeyboard;
 import com.art.game.level.Level;
+import com.art.game.net.packet.Packet02Mover;
 
 public class Player extends Mob {
 
@@ -27,15 +29,21 @@ public class Player extends Mob {
 		contaUpdates ++;
 		
 		int xA = 0, yA = 0;
-		
-		if (input.cima.pressionado()) yA --;
-		if (input.baixo.pressionado()) yA ++;
-		if (input.direita.pressionado()) xA ++;
-		if (input.esquerda.pressionado()) xA --;
+		if (input != null) {
+			if (input.cima.pressionado()) yA --;
+			if (input.baixo.pressionado()) yA ++;
+			if (input.direita.pressionado()) xA ++;
+			if (input.esquerda.pressionado()) xA --;
+		}
 		
 		if (xA != 0 || yA != 0) {
 			mover(xA, yA);
 			caminhando = true;
+			
+			Packet02Mover packet = new Packet02Mover(this.getNomeUsuario(), this.x, this.y,
+					this.numeroPassos, this.caminhando, this.direcao);
+			
+			packet.escrever(Game.game.cliente);
 		} else {
 			caminhando = false;
 		}
@@ -132,5 +140,9 @@ public class Player extends Mob {
 		}
 		
 		return false;
+	}
+	
+	public String getNomeUsuario() {
+		return nomeUsuario;
 	}
 }

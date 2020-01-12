@@ -25,7 +25,7 @@ public class TileBasico extends Tile {
 	
 	@Override
 	public void renderizar(Screen tela, Level level, int x, int y) {
-		tela.renderizar(x, y, tileID, tileCor, 1);
+		tela.renderizar(x, y, tileID, tileCor, 0x00, 1);
 	}
 
 }

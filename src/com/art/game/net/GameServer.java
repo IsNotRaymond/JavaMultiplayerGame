@@ -5,17 +5,23 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.art.game.Game;
+import com.art.game.entities.PlayerMP;
+import com.art.game.net.packet.Packet;
+import com.art.game.net.packet.Packet.PacketTypes;
+import com.art.game.net.packet.Packet00Login;
+import com.art.game.net.packet.Packet01Desconectar;
+import com.art.game.net.packet.Packet02Mover;
 
 public class GameServer extends Thread {
 	private final int MAX_DATAGRAM_PACKET = 1024;
 	
-	private InetAddress ipAddress;
 	private DatagramSocket socket;
 	private Game game;
-	
-	// private List<PlayerMP> connectedPlayers = new ArrayList<PlayerMP>();
+	private List<PlayerMP> jogadoresConectados = new ArrayList<PlayerMP>();
 	
 	public GameServer(Game game) {
 		this.game = game;
@@ -29,8 +35,8 @@ public class GameServer extends Thread {
 	
 	public void run() {
 		while (true) {
-			byte[] data = new byte[MAX_DATAGRAM_PACKET];
-			DatagramPacket packet = new DatagramPacket(data, MAX_DATAGRAM_PACKET);
+			byte[] dados = new byte[MAX_DATAGRAM_PACKET];
+			DatagramPacket packet = new DatagramPacket(dados, dados.length);
 			
 			try {
 				socket.receive(packet);
@@ -38,73 +44,112 @@ public class GameServer extends Thread {
 				e.printStackTrace();
 			}
 			
-			// parsePacket(packet.getData(), packet.getAddress(), packet.getPort());
-			
-			
-			String message = new String(packet.getData());
-			System.out.println("CLIENT ["+ packet.getAddress().getHostAddress() +":" +packet.getPort() + "]> " + new String(packet.getData()));
-			
-			if (message.trim().equalsIgnoreCase("ping")) {
-				sendData("pong".getBytes(), packet.getAddress(), packet.getPort());
-			}
-			
+			this.processarPacket(packet.getData(), packet.getAddress(), packet.getPort());
 		}
 	}
-	 /*
-	private void parsePacket(byte[] data, InetAddress address, int port) {
-		String dataMessage = new String(data).trim();
-		PacketTypes type = Packet.lookupPacket(Integer.parseInt(dataMessage.substring(0, 2)));
+	
+	private void processarPacket(byte[] data, InetAddress enderecoIp, int porta) {
+		String mensagem = new String(data).trim();
+		PacketTypes tipo = Packet.verificarPacket(Integer.parseInt(mensagem.substring(0, 2)));
 		Packet packet = null;
 		
-		switch (type) {
+		switch (tipo) {
 			default:
-			case INVALID:
+			case INVALIDO:
 				break;
 			case LOGIN:
 				packet = new Packet00Login(data);
-				System.out.println("["+ address.getHostAddress() +":" + port + "]" + ((Packet00Login) packet).getUserName() + "has connected");
-			
-				PlayerMP player = new PlayerMP(((Packet00Login) packet).getUserName(), game.playerSpawn.getX(), game.playerSpawn.getY(), address, port);
-				addConnection(player, ((Packet00Login) packet));
+				System.out.println("[" + enderecoIp.getHostAddress() + ":" + porta + "] "
+	                    + ((Packet00Login) packet).getNomeUsuario() + " conectou ...");			
 				
-				if (player != null) {
-					connectedPlayers.add(player);
-					game.level.add(player);
-					game.player = player;
-				}
-					
-			case DISCONNECT:
+				PlayerMP jogador = new PlayerMP(game.level, 100, 100, ((Packet00Login) packet).getNomeUsuario(), enderecoIp, porta);
+				this.adicionarConexao(jogador, ((Packet00Login) packet));
+				
 				break;
+			case DESCONECTAR:
+				packet = new Packet01Desconectar(data);				
+				System.out.println("[" + enderecoIp.getHostAddress() + ":" + porta + "] "
+	                    + ((Packet01Desconectar) packet).getNomeUsuario() + " saiu ...");
+				
+				this.removerConexao(((Packet01Desconectar) packet));
+				
+				break;
+			case MOVER:
+				packet = new Packet02Mover(data);
+				controlarMovimento((Packet02Mover) packet);
 		}
 	}
 
-
-	private void addConnection(PlayerMP player, Packet00Login packet) {
-		boolean alreadyConnected = false;
-		
-		for (PlayerMP p : connectedPlayers) {
-			if (player.getName().equalsIgnoreCase(p.getName())) {
-				if (p.ipAddress == null) {
-					p.ipAddress = player.ipAddress;
-				}
-				
-				if (p.port == -1) {
-					p.port = player.port;
-				}
-				
-				alreadyConnected = true;
-			} 
-		}
-		
-		if (!alreadyConnected) {
-			this.connectedPlayers.add(player);
-			packet.writeData(this);
+	private void controlarMovimento(Packet02Mover packet) {
+		if (getPlayerMP(packet.getNomeUsuario()) != null) {
+			int indice = getIndicePlayerMP(packet.getNomeUsuario());
+			
+			this.jogadoresConectados.get(indice).x = packet.getX();
+			this.jogadoresConectados.get(indice).y = packet.getY();
+			packet.escrever(this);
 		}
 	}
-	*/
 
-	public void sendData(byte[] data, InetAddress ipAddress, int port) {
-		DatagramPacket packet = new DatagramPacket(data, data.length, ipAddress, port);
+	public void removerConexao(Packet01Desconectar packet) {
+		this.jogadoresConectados.remove(getIndicePlayerMP(packet.getNomeUsuario()));
+		
+		packet.escrever(this);
+	}
+	
+	public PlayerMP getPlayerMP(String nomeUsuario) {
+		for (PlayerMP p : this.jogadoresConectados) {
+			if (p.getNomeUsuario().equals(nomeUsuario)) {
+				return p;
+			}
+		}
+		return null;
+	}
+	
+	public int getIndicePlayerMP(String nomeUsuario) {
+		int indice = 0;
+		
+		for (PlayerMP player : this.jogadoresConectados) {
+			if (player.getNomeUsuario().equals(nomeUsuario)) {
+				break;
+			}
+			
+			indice ++;
+		}
+		
+		return indice;
+	}
+
+	public void adicionarConexao(PlayerMP jogador, Packet00Login packet) {
+		boolean foiConectado = false;
+		
+		for (PlayerMP p : this.jogadoresConectados) {
+			if (jogador.getNomeUsuario().equalsIgnoreCase(p.getNomeUsuario())) {
+				if (p.enderecoIp == null) {
+					p.enderecoIp = jogador.enderecoIp;
+				}
+				
+				if (p.porta == -1) {
+					p.porta = jogador.porta;
+				}
+				
+				foiConectado = true;
+			} else {
+				// mostra para o player conectado que apareceu um novo player
+				enviar(packet.getData(), p.enderecoIp, p.porta);
+				
+				// mostra para o novo player que o player conectado existe
+				packet = new Packet00Login(p.getNomeUsuario(), p.x, p.y);
+				enviar(packet.getData(), jogador.enderecoIp, jogador.porta);
+			}
+		}
+		
+		if (!foiConectado) {
+			this.jogadoresConectados.add(jogador);
+		}
+	}
+
+	public void enviar(byte[] data, InetAddress enderecoIp, int porta) {
+		DatagramPacket packet = new DatagramPacket(data, data.length, enderecoIp, porta);
 		try {
 			socket.send(packet);
 		} catch (IOException e) {
@@ -112,12 +157,10 @@ public class GameServer extends Thread {
 		}
 	}
 	
-	/*
-	public void sendDataToAllClients(byte[] data) {
-		for (PlayerMP p : connectedPlayers) {
-			sendData(data, p.ipAddress, p.port);
+	public void enviarParaTodosClientes(byte[] data) {
+		for (PlayerMP p : jogadoresConectados) {
+			enviar(data, p.enderecoIp, p.porta);
 		}
 		
 	}
-	*/
 }

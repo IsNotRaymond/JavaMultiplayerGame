@@ -1,7 +1,6 @@
 package com.art.game.input;
 
 public class Key {
-	
 	boolean pressionado = false;
 	
 	public static Key CIMA = new Key();

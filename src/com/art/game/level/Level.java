@@ -9,6 +9,7 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import com.art.game.entities.Entity;
+import com.art.game.entities.PlayerMP;
 import com.art.game.graphics.Screen;
 import com.art.game.level.tiles.Tile;
 
@@ -17,14 +18,11 @@ public class Level {
 	private byte[] tiles;
 	public int largura;
 	public int altura;
-	private String caminhoImagem;
-	
 	public List<Entity> entities = new ArrayList<Entity>();
 	private BufferedImage imagem;
 
 	public Level(String caminhoImagem) {
 		if (caminhoImagem != null) {
-			this.caminhoImagem = caminhoImagem;
 			gerarLevel(caminhoImagem);
 		} else {
 			largura = 64;
@@ -69,21 +67,6 @@ public class Level {
 		}
 	}
 	
-
-	@SuppressWarnings("unused")
-	private void salvarLevel() {
-		try {
-			ImageIO.write(imagem, "png", new File(caminhoImagem));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public void alterarTile(int x, int y, Tile novoTile) {
-		tiles[x + y * largura] = novoTile.getID();
-		imagem.setRGB(x, y, novoTile.getCorLevel());
-	}
-	
 	private void carregarTiles() {
 		int[] corTile = this.imagem.getRGB(0, 0, largura, altura, null, 0, largura);
 		
@@ -101,8 +84,12 @@ public class Level {
 		}
 	}
 	
+	public synchronized List<Entity> getEntities() {
+		return entities;
+	}
+	
 	public void update() {
-		for (Entity e : entities) {
+		for (Entity e : getEntities()) {
 			e.update();
 		}
 		
@@ -113,6 +100,8 @@ public class Level {
 		}
 	}
 
+	
+	
 	public void renderizarTile(Screen tela, int xOffSet, int yOffSet) {
 		if (xOffSet < 0)
 			xOffSet = 0;
@@ -133,7 +122,7 @@ public class Level {
 	}
 
 	public void renderizarEntities(Screen tela) {
-		for (Entity e : entities) {
+		for (Entity e : getEntities()) {
 			e.renderizar(tela);
 		}
 	}
@@ -145,7 +134,46 @@ public class Level {
 		return Tile.tiles[tiles[x + y * largura]];
 	}
 
-	public void addEntity(Entity e) {
-		entities.add(e);
+	public synchronized void addEntity(Entity e) {
+		this.getEntities().add(e);
+	}
+
+	public synchronized void removePlayerMP(String nomeUsuario) {
+		int indice = 0;
+		
+		for (Entity e : getEntities()) {
+			if (e instanceof PlayerMP && ((PlayerMP) e).getNomeUsuario().equals(nomeUsuario)) {
+				break;
+			}
+			indice ++;
+		}
+		
+		this.getEntities().remove(indice);
+	}
+	
+	private int getIndicePlayerMP(String nomeUsuario) {
+		int indice = 0;
+		for (Entity e : getEntities()) {
+			if (e instanceof PlayerMP && ((PlayerMP) e).getNomeUsuario().equals(nomeUsuario)) {
+				break;
+			}
+			indice ++;
+		}
+		return indice;
+	}
+	
+	public synchronized void moverJogador(String nomeUsuario, int x, int y, int numeroPassos, boolean caminhando, int direcao) {
+		int indice = getIndicePlayerMP(nomeUsuario);
+		
+		PlayerMP jogador = (PlayerMP) this.getEntities().get(indice);
+		
+		jogador.x = x;
+		jogador.y = y;
+		jogador.setCaminhando(caminhando);
+		jogador.setNumeroPassos(numeroPassos);
+        jogador.setDirecao(direcao);
+		
+		this.getEntities().get(indice).x = x;
+		this.getEntities().get(indice).y = y;
 	}
 }

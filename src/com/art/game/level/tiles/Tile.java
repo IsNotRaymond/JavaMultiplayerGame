@@ -22,10 +22,10 @@ public abstract class Tile {
 		this.id = (byte) id;
 		if (tiles[id] != null) throw new GameException("ID " + id + " Duplicado");
 		
-		tiles[id] = this;
 		this.solido = solido;
 		this.corLevel = corLevel;
 		this.emissor = emissor;
+		tiles[id] = this;
 	}
 	
 	public byte getID() {

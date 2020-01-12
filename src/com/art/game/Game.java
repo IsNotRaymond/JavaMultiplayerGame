@@ -12,30 +12,35 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import com.art.game.entities.Player;
+import com.art.game.entities.PlayerMP;
 import com.art.game.graphics.Screen;
 import com.art.game.graphics.SpriteSheet;
 import com.art.game.input.InputKeyboard;
+import com.art.game.input.InputWindow;
 import com.art.game.level.Level;
 import com.art.game.net.GameClient;
 import com.art.game.net.GameServer;
+import com.art.game.net.packet.Packet00Login;
 
 public class Game extends Canvas implements Runnable {
 	private static final long serialVersionUID = 1L;
+	public static Game game;
 	
 	public static final int LARGURA = 160;
 	public static final int ALTURA = LARGURA / 12 * 9;
 	public static final int ESCALA = 3;
 	public static final String NOME = "GAME";
 	
-	private JFrame frame;
+	public JFrame frame;
 	private Thread thread;
 	private Screen tela;
-	private InputKeyboard input;
-	private Level level;
-	private Player player;
+	public InputKeyboard input;
+	public InputWindow window;
+	public Level level;
+	public Player jogador;
 	
-	private GameClient cliente;
-	private GameServer servidor;
+	public GameClient cliente;
+	public GameServer servidor;
 	
 	private BufferedImage imagem = new BufferedImage(LARGURA, ALTURA, BufferedImage.TYPE_INT_RGB);
 	private int[] pixels = ((DataBufferInt) imagem.getRaster().getDataBuffer()).getData();
@@ -43,6 +48,9 @@ public class Game extends Canvas implements Runnable {
 	
 	public boolean executando = false;
 	public int contaUpdates = 0;
+	
+	public boolean debug = true;
+	public boolean applet = false;
 	
 	public Game() {
 		setupFrame();
@@ -140,13 +148,26 @@ public class Game extends Canvas implements Runnable {
 	
 	private void init() {
 		adicionarCores();
-		
+		game = this;
 		tela = new Screen(LARGURA, ALTURA, new SpriteSheet("res/sheet/spritesheet.png"));
 		input = new InputKeyboard(this);
+		window = new InputWindow(this);
 		level = new Level("res/levels/watertest.png");
-		player = new Player(level, 0, 0, input, JOptionPane.showInputDialog(this, "Por favor, ponha seu nome abaixo"));
-		level.addEntity(player);
-		cliente.sendData("ping".getBytes());
+
+		jogador = new PlayerMP(level, 100, 100, input, JOptionPane.showInputDialog(this, "Por favor, ponha seu nome abaixo"), null, -1);
+		level.addEntity(jogador);
+		
+		// cliente.enviar("ping".getBytes());
+		
+		if (!applet) {
+			Packet00Login login = new Packet00Login(jogador.getNomeUsuario(), jogador.x, jogador.y);
+			
+			if (servidor != null) {
+				servidor.adicionarConexao((PlayerMP) jogador, login);
+			}
+			
+			login.escrever(cliente);
+		}
 	}
 
 	private void adicionarCores() {
@@ -167,8 +188,6 @@ public class Game extends Canvas implements Runnable {
 	
 	public void update() {
 		contaUpdates ++;
-		
-		//player.update();
 		level.update();
 	}
 	
@@ -180,7 +199,7 @@ public class Game extends Canvas implements Runnable {
 			return;
 		}
 		
-		level.renderizarTile(tela, player.x - (tela.largura / 2), player.y - (tela.altura / 2));
+		level.renderizarTile(tela, jogador.x - (tela.largura / 2), jogador.y - (tela.altura / 2));
 		level.renderizarEntities(tela);
 		
 		
